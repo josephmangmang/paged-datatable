@@ -23,52 +23,55 @@ class _PagedDataTableHeaderRow<TKey extends Object, TResult extends Object>
                 var state = context.read<_PagedDataTableState<TKey, TResult>>();
                 return Row(
                   children: state.columns
-                      .map((column) => Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: SizedBox(
-                                width: column.sizeFactor == null
-                                    ? state._nullSizeFactorColumnsWidth
-                                    : width * column.sizeFactor!,
-                                child: Tooltip(
-                                    message: column.title,
-                                    child: MouseRegion(
-                                      cursor: column.sortable
-                                          ? SystemMouseCursors.click
-                                          : SystemMouseCursors.basic,
-                                      child: GestureDetector(
-                                        onTap: column.sortable
-                                            ? () {
-                                                state.swapSortBy(column.id!);
-                                              }
-                                            : null,
-                                        child: Row(
-                                          mainAxisAlignment: column.isNumeric
-                                              ? MainAxisAlignment.end
-                                              : MainAxisAlignment.start,
-                                          children: [
-                                            if (state.isSorted &&
-                                                state._sortBy!.columnId ==
-                                                    column.id) ...[
-                                              state._sortBy!._descending
-                                                  ? const Icon(Icons
-                                                      .arrow_downward_rounded)
-                                                  : const Icon(Icons
-                                                      .arrow_upward_rounded),
-                                              const SizedBox(width: 8)
-                                            ],
-                                            Flexible(
-                                                child: Text(column.title,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                    overflow:
-                                                        TextOverflow.ellipsis))
+                      .map((column) {
+                        final itemWidth = column.sizeFactor == null
+                            ? state._nullSizeFactorColumnsWidth
+                            : width * column.sizeFactor!;
+                        return SizedBox(
+                            width:itemWidth,
+                            child: Padding(
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Tooltip(
+                                  message: column.title,
+                                  child: MouseRegion(
+                                    cursor: column.sortable
+                                        ? SystemMouseCursors.click
+                                        : SystemMouseCursors.basic,
+                                    child: GestureDetector(
+                                      onTap: column.sortable
+                                          ? () {
+                                              state.swapSortBy(column.id!);
+                                            }
+                                          : null,
+                                      child: Row(
+                                        mainAxisAlignment: column.isNumeric
+                                            ? MainAxisAlignment.end
+                                            : MainAxisAlignment.start,
+                                        children: [
+                                          if (state.isSorted &&
+                                              state._sortBy!.columnId ==
+                                                  column.id) ...[
+                                            state._sortBy!._descending
+                                                ? const Icon(Icons
+                                                    .arrow_downward_rounded)
+                                                : const Icon(Icons
+                                                    .arrow_upward_rounded),
+                                            const SizedBox(width: 8)
                                           ],
-                                        ),
+                                          Flexible(
+                                              child: Text(column.title,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                  overflow:
+                                                      TextOverflow.ellipsis))
+                                        ],
                                       ),
-                                    ))),
-                          ))
+                                    ),
+                                  )),
+                            ));
+                      })
                       .toList(),
                 );
               }),

@@ -11,27 +11,41 @@ import 'package:provider/provider.dart';
 import 'package:equatable/equatable.dart';
 
 part 'controls.dart';
+
 part 'errors.dart';
+
 part 'paged_datatable_column.dart';
+
 part 'paged_datatable_column_header.dart';
+
 part 'paged_datatable_controller.dart';
+
 part 'paged_datatable_filter.dart';
+
 part 'paged_datatable_filter_bar.dart';
+
 part 'paged_datatable_filter_bar_menu.dart';
+
 part 'paged_datatable_footer.dart';
+
 part 'paged_datatable_menu.dart';
+
 part 'paged_datatable_row_state.dart';
+
 part 'paged_datatable_rows.dart';
+
 part 'paged_datatable_state.dart';
+
 part 'paged_datatable_theme.dart';
+
 part 'pagination_result.dart';
+
 part 'types.dart';
 
 /// A paginated DataTable that allows page caching and filtering
 /// [TKey] is the type of the page token
 /// [TResult] is the type of data the data table will show.
-class PagedDataTable<TKey extends Object, TResult extends Object>
-    extends StatelessWidget {
+class PagedDataTable<TKey extends Object, TResult extends Object> extends StatelessWidget {
   final FetchCallback<TKey, TResult> fetchPage;
   final TKey initialPage;
   final List<TableFilter>? filters;
@@ -45,6 +59,7 @@ class PagedDataTable<TKey extends Object, TResult extends Object>
   final bool rowsSelectable;
   final CustomRowBuilder<TResult>? customRowBuilder;
   final Stream? refreshListener;
+  final double? maxWidth;
 
   const PagedDataTable(
       {required this.fetchPage,
@@ -61,6 +76,7 @@ class PagedDataTable<TKey extends Object, TResult extends Object>
       this.rowsSelectable = false,
       this.customRowBuilder,
       this.refreshListener,
+      this.maxWidth,
       super.key});
 
   @override
@@ -76,9 +92,7 @@ class PagedDataTable<TKey extends Object, TResult extends Object>
           refreshListener: refreshListener),
       builder: (context, widget) {
         var state = context.read<_PagedDataTableState<TKey, TResult>>();
-        final localTheme = PagedDataTableTheme.maybeOf(context) ??
-            theme ??
-            _kDefaultPagedDataTableTheme;
+        final localTheme = PagedDataTableTheme.maybeOf(context) ?? theme ?? _kDefaultPagedDataTableTheme;
 
         Widget child = Material(
           color: localTheme.backgroundColor,
@@ -86,30 +100,34 @@ class PagedDataTable<TKey extends Object, TResult extends Object>
           textStyle: localTheme.textStyle,
           shape: theme?.border,
           child: LayoutBuilder(builder: (context, constraints) {
-            var width = constraints.maxWidth - (columns.length * 32);
+            var width = (maxWidth ?? constraints.maxWidth) - (columns.length * 32);
             state.availableWidth = width;
             return Column(
               children: [
                 /* FILTER TAB */
-                if (header != null ||
-                    menu != null ||
-                    state.filters.isNotEmpty) ...[
+                if (header != null || menu != null || state.filters.isNotEmpty) ...[
                   _PagedDataTableFilterTab<TKey, TResult>(menu, header),
                   Divider(height: 0, color: localTheme.dividerColor),
                 ],
-
-                /* HEADER ROW */
-                _PagedDataTableHeaderRow<TKey, TResult>(rowsSelectable, width),
-                Divider(height: 0, color: localTheme.dividerColor),
-
-                /* ITEMS */
                 Expanded(
-                  child: _PagedDataTableRows<TKey, TResult>(
-                      rowsSelectable,
-                      customRowBuilder,
-                      noItemsFoundBuilder,
-                      errorBuilder,
-                      width),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: width,
+                      child: Column(
+                        children: [
+                          /* HEADER ROW */
+                          _PagedDataTableHeaderRow<TKey, TResult>(rowsSelectable, width),
+                          Divider(height: 0, color: localTheme.dividerColor),
+                          /* ITEMS */
+                          Expanded(
+                            child: _PagedDataTableRows<TKey, TResult>(
+                                rowsSelectable, customRowBuilder, noItemsFoundBuilder, errorBuilder, width),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
 
                 /* FOOTER */
@@ -123,14 +141,10 @@ class PagedDataTable<TKey extends Object, TResult extends Object>
         // apply configuration to this widget only
         if (theme != null) {
           child = PagedDataTableTheme(data: theme!, child: child);
-          assert(
-              theme!.rowColors != null ? theme!.rowColors!.length == 2 : true,
+          assert(theme!.rowColors != null ? theme!.rowColors!.length == 2 : true,
               "rowColors must contain exactly two colors");
         } else {
-          assert(
-              localTheme.rowColors != null
-                  ? localTheme.rowColors!.length == 2
-                  : true,
+          assert(localTheme.rowColors != null ? localTheme.rowColors!.length == 2 : true,
               "rowColors must contain exactly two colors");
         }
 
