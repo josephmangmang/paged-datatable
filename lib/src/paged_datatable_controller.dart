@@ -4,7 +4,7 @@ part of 'paged_datatable.dart';
 
 /// Represents a controller of a [PagedDataTable]
 class PagedDataTableController<TKey extends Object, TResult extends Object> {
-  late final _PagedDataTableState<TKey, TResult> _state;
+  late _PagedDataTableState<TKey, TResult> _state;
 
   /// Returns the current showing dataset elements.
   Iterable<TResult> get currentDataset => _state._rowsState.map((e) => e.item);

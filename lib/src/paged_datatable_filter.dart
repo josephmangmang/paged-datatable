@@ -20,8 +20,7 @@ abstract class TableFilter<TValue> {
   int get hashCode => id.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      other is TableFilter ? other.id == id : false;
+  bool operator ==(Object other) => other is TableFilter ? other.id == id : false;
 }
 
 /// A filter that is not visible in the popup dialog but can be set with the controller.
@@ -43,11 +42,7 @@ class TextTableFilter extends TableFilter<String> {
   final InputDecoration? decoration;
 
   const TextTableFilter(
-      {this.decoration,
-      required super.chipFormatter,
-      required super.id,
-      required super.title,
-      super.defaultValue})
+      {this.decoration, required super.chipFormatter, required super.id, required super.title, super.defaultValue})
       : super(visible: true);
 
   @override
@@ -67,22 +62,24 @@ class TextTableFilter extends TableFilter<String> {
 class DropdownTableFilter<TValue> extends TableFilter<TValue> {
   final InputDecoration? decoration;
   final List<DropdownMenuItem<TValue>> items;
+  final ValueChanged<TValue?>? onChanged;
 
-  const DropdownTableFilter(
-      {this.decoration,
-      required this.items,
-      required super.chipFormatter,
-      required super.id,
-      required super.title,
-      super.defaultValue})
-      : super(visible: true);
+  const DropdownTableFilter({
+    this.decoration,
+    required this.items,
+    required super.chipFormatter,
+    required super.id,
+    required super.title,
+    super.defaultValue,
+    this.onChanged,
+  }) : super(visible: true);
 
   @override
   Widget buildPicker(BuildContext context, TableFilterState state) {
     return DropdownButtonFormField<TValue>(
       items: items,
       value: state.value,
-      onChanged: (newValue) {},
+      onChanged: onChanged,
       onSaved: (newValue) {
         state.value = newValue;
       },

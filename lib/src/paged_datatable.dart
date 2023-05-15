@@ -60,24 +60,33 @@ class PagedDataTable<TKey extends Object, TResult extends Object> extends Statel
   final CustomRowBuilder<TResult>? customRowBuilder;
   final Stream? refreshListener;
   final double? maxWidth;
+  final double? filterDialogWidth;
+  final VoidCallback? customFilterPageOnPressed;
+  final bool hideDefaultFilterIcon;
+  final Function(BuildContext context, _PagedDataTableRowState<TResult> rowsState)? onRowTap;
 
-  const PagedDataTable(
-      {required this.fetchPage,
-      required this.initialPage,
-      required this.columns,
-      this.filters,
-      this.menu,
-      this.controller,
-      this.footer,
-      this.header,
-      this.theme,
-      this.errorBuilder,
-      this.noItemsFoundBuilder,
-      this.rowsSelectable = false,
-      this.customRowBuilder,
-      this.refreshListener,
-      this.maxWidth,
-      super.key});
+  const PagedDataTable({
+    required this.fetchPage,
+    required this.initialPage,
+    required this.columns,
+    this.filters,
+    this.menu,
+    this.controller,
+    this.footer,
+    this.header,
+    this.theme,
+    this.errorBuilder,
+    this.noItemsFoundBuilder,
+    this.rowsSelectable = false,
+    this.customRowBuilder,
+    this.refreshListener,
+    this.maxWidth,
+    super.key,
+    this.filterDialogWidth,
+    this.customFilterPageOnPressed,
+    this.hideDefaultFilterIcon = false,
+    this.onRowTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +115,13 @@ class PagedDataTable<TKey extends Object, TResult extends Object> extends Statel
               children: [
                 /* FILTER TAB */
                 if (header != null || menu != null || state.filters.isNotEmpty) ...[
-                  _PagedDataTableFilterTab<TKey, TResult>(menu, header),
+                  _PagedDataTableFilterTab<TKey, TResult>(
+                    menu,
+                    header,
+                    filterDialogWidth,
+                    customFilterPageOnPressed: customFilterPageOnPressed,
+                    hideDefaultFilterIcon: hideDefaultFilterIcon,
+                  ),
                   Divider(height: 0, color: localTheme.dividerColor),
                 ],
                 Expanded(
@@ -122,7 +137,13 @@ class PagedDataTable<TKey extends Object, TResult extends Object> extends Statel
                           /* ITEMS */
                           Expanded(
                             child: _PagedDataTableRows<TKey, TResult>(
-                                rowsSelectable, customRowBuilder, noItemsFoundBuilder, errorBuilder, width),
+                              rowsSelectable,
+                              customRowBuilder,
+                              noItemsFoundBuilder,
+                              errorBuilder,
+                              width,
+                              onRowTap,
+                            ),
                           )
                         ],
                       ),
