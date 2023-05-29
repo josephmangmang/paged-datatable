@@ -26,6 +26,11 @@ class PagedDataTableController<TKey extends Object, TResult extends Object> {
     _state.applyFilter(id, value);
   }
 
+  /// Sets a filter and fetches items from source.
+  void setFilters(Map<String, dynamic> filters) {
+    _state.setFilters(filters);
+  }
+
   /// Removes a filter and fetches items from source.
   void removeFilter(String id) {
     _state.removeFilter(id);

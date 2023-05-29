@@ -98,6 +98,18 @@ class _PagedDataTableState<TKey extends Object, TResult extends Object>
     }
   }
 
+  void setFilters(Map<String, dynamic> filters) {
+    for (var filter in filters.entries) {
+      var filterState = this.filters[filter.key];
+      if (filterState == null) {
+        throw TableError("Filter ${filter.key} not found.");
+      }
+
+      filterState.value = filter.value;
+    }
+    _refresh(currentDataset: false);
+  }
+
   void applyFilter(String filterId, dynamic value) {
     var filter = filters[filterId];
     if (filter == null) {
